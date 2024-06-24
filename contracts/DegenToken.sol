@@ -8,8 +8,10 @@ address gameOwner;
 uint256  tokenPrice;
 uint256  healthCost;
 uint256  skinCost;
-uint256  emblemCost;
+uint256  emblemCost; 
 uint256 gemCost;
+
+mapping (address => mapping (string => uint256)) public playerInventory;
 
 constructor() ERC20("DegenToken", "DGN") {
 gameOwner = msg.sender;
@@ -50,23 +52,23 @@ function showStore() external pure returns (string memory) {
 return "Health, Skin, Emblems, Gems";
 }
 
-function redeemItem(string calldata _item, uint256 quantity) public {
+function redeemItem(string calldata _item, uint256 quantity) public payable {
 if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("Health"))) {
 require(balanceOf(msg.sender) >= healthCost * quantity, "Not enough Degen Tokens to buy health");
 _transfer(msg.sender, address(this), healthCost * quantity);
-// grant health to player
+playerInventory[msg.sender]["Health"] += quantity; // deliver health to player
 } else if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("Skin"))) {
 require(balanceOf(msg.sender) >= skinCost * quantity, "Not enough Degen Tokens to buy skin");
 _transfer(msg.sender, address(this), skinCost * quantity);
-// grant skin to player
+playerInventory[msg.sender]["Skin"] += quantity; // deliver skin to player
 } else if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("Emblem"))) {
 require(balanceOf(msg.sender) >= emblemCost * quantity, "Not enough Degen Tokens to buy emblem");
 _transfer(msg.sender, address(this), emblemCost * quantity);
-// grant emblem to player
+playerInventory[msg.sender]["Emblem"] += quantity; // deliver emblem to player
 } else if (keccak256(abi.encodePacked(_item)) == keccak256(abi.encodePacked("Gems"))) {
 require(balanceOf(msg.sender) >= gemCost * quantity, "Not enough Degen Tokens to buy gems");
 _transfer(msg.sender, address(this), gemCost * quantity);
-// grant gems to player
+playerInventory[msg.sender]["Gems"] += quantity; // deliver gems to player
 } else {
 revert("Invalid item");
 }
